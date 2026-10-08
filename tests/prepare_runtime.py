@@ -9,6 +9,7 @@ root = Path(__file__).resolve().parents[1]
 profile = root / '.test-profile'
 (profile / 'extensions').mkdir(parents=True, exist_ok=True)
 (profile / 'data').mkdir(exist_ok=True)
+(profile / 'result.json').unlink(missing_ok=True)
 archive = build.build()
 (profile / 'extensions' / 'batch-add-info@yuan.local').write_text(str(root), encoding='utf-8')
 prefs = {
@@ -23,6 +24,7 @@ prefs = {
     'extensions.zotero.repository.autoUpdate': False,
     'extensions.zotero.retractions.enabled': False,
     'extensions.zotero.streaming.enabled': False,
+    'extensions.batch-add-info.lastField': 'extra',
     'extensions.zoteroWinWordIntegration.skipInstallation': True,
     'extensions.zoteroOpenOfficeIntegration.skipInstallation': True,
     'extensions.autoDisableScopes': 0,
@@ -46,6 +48,7 @@ manifest = {
 }
 script = (root / 'tests' / 'runtime-bootstrap.js').read_text(encoding='utf-8')
 script = script.replace('__REPORT__', json.dumps(str(profile / 'result.json')))
+script = script.replace('__DATA_DIR__', json.dumps(str(profile / 'data')))
 harness = profile / 'harness'
 harness.mkdir(exist_ok=True)
 (harness / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')

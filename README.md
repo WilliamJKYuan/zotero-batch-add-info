@@ -1,10 +1,10 @@
 # Zotero 批量添加信息
 
-为 Zotero 10 编写的插件。选中多篇文献后，通过右键菜单“添加信息…”打开窗口，上方选择字段，下方输入内容，然后批量追加到字段末尾，保留每篇文献原有的信息。
+为 Zotero 10 编写的插件。选中多篇文献后，通过右键菜单“添加信息…”打开窗口，选择字段和添加位置，再输入内容，即可批量添加到字段开头或末尾，保留每篇文献原有的信息。
 
 ## 安装
 
-1. 从 [最新 Release](https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/latest) 下载 XPI 安装包。开发时也可使用本地 `dist/zotero-batch-add-info-1.0.2.xpi`。
+1. 从 [最新 Release](https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/latest) 下载 XPI 安装包。开发时也可使用本地 `dist/zotero-batch-add-info-1.0.3.xpi`。
 2. 打开 Zotero，进入“工具 → 插件”。
 3. 点击插件管理窗口右上方齿轮，选择“Install Plugin From File…”（从文件安装插件）。
 4. 选择下载的 XPI。
@@ -19,15 +19,15 @@
 
 1. 在文献列表中按 Ctrl / Shift（macOS 用 Command / Shift）选中多篇文献。
 2. 右键 → **添加信息…**。
-3. 在上方下拉框选择字段，在下方输入要添加的内容。
+3. 在上方下拉框选择字段，再选择“添加位置”：**末尾**（默认）或**开头**，然后输入要添加的内容。切换位置时预览会立即更新。
 4. 检查适用数量和第一篇文献的预览，然后点击 **添加到所选文献**。也可按 Ctrl+Enter / Command+Enter。
 5. 保存后显示成功和跳过的数量。若要恢复，在 Zotero 中选择 **编辑 → 撤销**；整批追加是一条撤销记录。
 
-默认选择“其他”（Extra）；以后记住上次选择的字段。输入内容不会存入插件偏好设置。
+默认选择“其他”（Extra）；以后记住上次选择的字段。每次打开窗口默认添加到末尾。输入内容不会存入插件偏好设置。
 
 ## 追加规则
 
-- 空字段直接填写，有内容的字段保留原内容并追加。
+- 空字段直接填写；有内容时可在开头或末尾添加，保留原内容。例如原内容是 `原文`、添加内容是 `新增`，使用空格分隔时，开头为 `新增 原文`，末尾为 `原文 新增`。
 - 默认分隔方式：摘要、其他等多行字段使用换行；其他字段使用空格。也可选空格、换行或直接连接。
 - 单行字段不支持实际换行，输入中的换行和换行分隔符会转换为空格。
 - 不同文献类型的同类字段按 Zotero 基础字段映射，例如“出版社”可对应学位论文的“大学”。下拉框显示每个字段适用的文献数。
@@ -52,7 +52,7 @@ python -m unittest discover -s tests -p test_build.py
 目标版本：Zotero 10.0.x。实现对照本机 Zotero 10.0.5 内置 API，以及官方 [Zotero 10 开发文档](https://www.zotero.org/support/dev/zotero_10_for_developers) 和 [菜单 API 文档](https://www.zotero.org/support/dev/zotero_8_for_developers#custom_menu_items)。
 
 
-现有检查包括 6 项核心逻辑测试、JavaScript 语法检查和 XPI 打包。Zotero 运行时测试需要独立的测试配置目录。
+现有检查包括核心逻辑测试、打包与更新清单测试、JavaScript 语法检查和 XPI 打包。Zotero 运行时测试需要独立的测试配置目录。
 
 ## 发布新版
 

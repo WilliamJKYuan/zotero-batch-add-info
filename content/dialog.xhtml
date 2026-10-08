@@ -12,8 +12,15 @@
     <html:label for="field">要添加信息的字段</html:label>
     <html:select id="field" aria-describedby="field-hint"/>
     <html:p id="field-hint" class="hint"/>
+    <html:div class="separator-row position-row">
+      <html:label for="position">添加位置</html:label>
+      <html:select id="position">
+        <html:option value="end">末尾</html:option>
+        <html:option value="start">开头</html:option>
+      </html:select>
+    </html:div>
     <html:label for="content">要添加的内容</html:label>
-    <html:textarea id="content" rows="5" placeholder="输入要追加到所选文献字段末尾的内容…"/>
+    <html:textarea id="content" rows="5" placeholder="输入要添加的内容…"/>
     <html:div class="separator-row">
       <html:label for="separator">与原内容之间</html:label>
       <html:select id="separator">

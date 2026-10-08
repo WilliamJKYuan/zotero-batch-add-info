@@ -1,6 +1,7 @@
 /* global Zotero */
 var BatchAddInfoCore = (() => {
   const SEPARATORS = new Set(["auto", "space", "newline", "none"]);
+  const POSITIONS = new Set(["start", "end"]);
 
   function isEligible(item) {
     return !!item && item.isRegularItem() && !item.deleted && !item.isFeedItem && item.isEditable();
@@ -41,8 +42,9 @@ var BatchAddInfoCore = (() => {
     });
   }
 
-  function append(oldValue, text, separator = "auto", multiline = false) {
+  function append(oldValue, text, separator = "auto", multiline = false, position = "end") {
     if (!SEPARATORS.has(separator)) throw new Error("未知的分隔方式。");
+    if (!POSITIONS.has(position)) throw new Error("未知的添加位置。");
     let addition = String(text).replace(/\r\n?/g, "\n").trim();
     if (!addition) throw new Error("请输入要添加的内容。");
     if (!multiline) addition = addition.replace(/\n+/g, " ");
@@ -51,13 +53,15 @@ var BatchAddInfoCore = (() => {
     let joiner = separator === "none" ? "" : separator === "space" ? " "
       : separator === "newline" ? "\n" : multiline ? "\n" : " ";
     if (!multiline && joiner === "\n") joiner = " ";
-    if (joiner && existing.endsWith(joiner)) joiner = "";
-    return existing + joiner + addition;
+    if (joiner && (position === "start" ? existing.startsWith(joiner) : existing.endsWith(joiner))) {
+      joiner = "";
+    }
+    return position === "start" ? addition + joiner + existing : existing + joiner + addition;
   }
 
-  async function apply(zotero, ids, name, text, separator = "auto") {
+  async function apply(zotero, ids, name, text, separator = "auto", position = "end") {
     // Validate input before starting a transaction or changing any cached item.
-    append("", text, separator);
+    append("", text, separator, false, position);
     if (!zotero.ItemFields.getID(name)) throw new Error("未知字段。");
     const uniqueIDs = [...new Set(ids)];
     const touched = new Set();
@@ -77,7 +81,7 @@ var BatchAddInfoCore = (() => {
           }
           await item.loadDataType("itemData");
           const next = append(item.getField(actual), text, separator,
-            zotero.ItemFields.isMultiline(actual));
+            zotero.ItemFields.isMultiline(actual), position);
           touched.add(item);
           if (item.setField(actual, next) === false) {
             result.unchanged++;

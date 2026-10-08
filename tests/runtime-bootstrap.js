@@ -25,7 +25,8 @@ async function onMainWindowLoad({ window }) {
   }
   let report;
   try {
-    const menu = await waitFor(() => Zotero.MenuManager.getCustomMenuOptions('main/library/item')
+    check(Zotero.DataDirectory.dir === __DATA_DIR__, 'runtime tests use the isolated data directory');
+    const menu = await waitFor(() => Zotero.MenuManager._menuManager.getCustomMenuOptions('main/library/item')
       .find(x => x.pluginID === 'batch-add-info@yuan.local'), 'menu registration');
     check(menu.menus[0].l10nID === 'batch-add-info-menu', 'native context menu registered');
     const scope = {};
@@ -54,38 +55,50 @@ async function onMainWindowLoad({ window }) {
     const doc = dialog.document;
     await waitFor(() => doc.getElementById('field')?.options.length, 'dialog initialization');
     check(doc.getElementById('field').value === 'extra', 'field selector defaults to Extra');
+    check(doc.getElementById('position').value === 'end', 'position selector defaults to end');
     const input = doc.getElementById('content');
     input.value = '新增信息';
     input.dispatchEvent(new dialog.Event('input', { bubbles: true }));
     check(doc.getElementById('preview').textContent === '原有信息甲\n新增信息', 'dialog preview preserves original content');
+    const position = doc.getElementById('position');
+    position.value = 'start';
+    position.dispatchEvent(new dialog.Event('change', { bubbles: true }));
+    check(doc.getElementById('preview').textContent === '新增信息\n原有信息甲', 'position change immediately refreshes prepend preview');
+    check(doc.getElementById('field-hint').textContent.includes('开头'), 'field hint reflects prepend position');
+    position.value = 'end';
+    position.dispatchEvent(new dialog.Event('change', { bubbles: true }));
+    check(doc.getElementById('preview').textContent === '原有信息甲\n新增信息', 'switching back restores append preview');
+    position.value = 'start';
+    position.dispatchEvent(new dialog.Event('change', { bubbles: true }));
     check(!doc.getElementById('apply').disabled, 'save button becomes enabled');
     doc.getElementById('apply').click();
     await waitFor(() => doc.getElementById('apply').textContent === '已完成'
       || doc.getElementById('status').className === 'error', 'save result');
     check(doc.getElementById('status').className === 'success', 'dialog save succeeded: ' + doc.getElementById('status').textContent);
-    check(a.getField('extra') === '原有信息甲\n新增信息', 'existing field appended');
+    check(a.getField('extra') === '新增信息\n原有信息甲', 'existing field prepended through dialog');
     check(b.getField('extra') === '新增信息', 'empty field filled');
     check(doc.getElementById('status').textContent.includes('跳过 1'), 'note skipped with result count');
     check(doc.getElementById('apply').disabled, 'repeat click prevented');
+    check(position.disabled, 'position changes disabled after saving');
     const action = Zotero.UndoHistory.getUndoAction();
     check(action?.actionArgs?.count === 2, 'batch saved as one undo action');
     await Zotero.UndoHistory.undo();
     check(a.getField('extra') === '原有信息甲' && b.getField('extra') === '', 'native undo restores both items');
     await Zotero.UndoHistory.redo();
-    check(a.getField('extra') === '原有信息甲\n新增信息' && b.getField('extra') === '新增信息', 'native redo restores batch');
+    check(a.getField('extra') === '新增信息\n原有信息甲' && b.getField('extra') === '新增信息', 'native redo restores prepend batch');
     dialog.close();
     await core.apply(Zotero, [thesis.id], 'publisher', '追加大学');
     check(thesis.getField('university') === '原大学 追加大学', 'mapped field saved using real API');
     const originalSave = b.save;
     b.save = async () => { throw new Error('intentional rollback check'); };
     let failed = false;
-    try { await core.apply(Zotero, [a.id, b.id], 'extra', '不应保存'); }
+    try { await core.apply(Zotero, [a.id, b.id], 'extra', '不应保存', 'auto', 'start'); }
     catch (error) { failed = error.message.includes('intentional'); }
     finally { b.save = originalSave; }
     check(failed, 'simulated failure surfaced');
-    check(a.getField('extra') === '原有信息甲\n新增信息' && b.getField('extra') === '新增信息', 'real transaction rollback restores cache');
+    check(a.getField('extra') === '新增信息\n原有信息甲' && b.getField('extra') === '新增信息', 'real prepend transaction rollback restores cache');
     const stored = await Zotero.DB.valueQueryAsync('SELECT value FROM itemData JOIN itemDataValues USING (valueID) WHERE itemID=? AND fieldID=?', [a.id, Zotero.ItemFields.getID('extra')]);
-    check(stored === '原有信息甲\n新增信息', 'real transaction rollback restores database');
+    check(stored === '新增信息\n原有信息甲', 'real prepend transaction rollback restores database');
     report = { ok: true, version: Zotero.version, checks };
   } catch (error) {
     report = { ok: false, checks, error: String(error), stack: error.stack };

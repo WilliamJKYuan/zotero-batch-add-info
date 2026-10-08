@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "批量添加信息",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "通过文献右键菜单，向批量选中的文献字段追加内容，保留原信息。",
   "author": "William Yuan",
   "applications": {

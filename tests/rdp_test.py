@@ -40,10 +40,14 @@ process = request('root', 'getProcess', id=0)
 actor = process['processDescriptor']['actor']
 target = request(actor, 'getTarget')['process']
 console = target['consoleActor']
-paths = [str(root / 'dist' / 'zotero-batch-add-info-1.0.0.xpi'), str(root / '.test-profile' / 'runtime-harness.xpi')]
+version = json.loads((root / 'manifest.json').read_text(encoding='utf-8'))['version']
+paths = [str(root / 'dist' / f'zotero-batch-add-info-{version}.xpi'), str(root / '.test-profile' / 'runtime-harness.xpi')]
 script = '''(async () => {
     const { Zotero } = ChromeUtils.importESModule('chrome://zotero/content/zotero.mjs');
     await Zotero.initializationPromise;
+    if (Zotero.DataDirectory.dir !== EXPECTEDDIR) {
+        throw new Error('Refusing to install the test harness outside the isolated data directory');
+    }
     const { AddonManager } = ChromeUtils.importESModule('resource://gre/modules/AddonManager.sys.mjs');
     for (const path of PATHS) {
         const file = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsIFile);
@@ -52,12 +56,15 @@ script = '''(async () => {
         await install.install();
     }
     return 'installed';
-})().catch(error => { dump('TEST INSTALL ERROR: ' + error + '\\n'); })'''.replace('PATHS', json.dumps(paths))
-print(json.dumps(request(console, 'evaluateJS', text=script), ensure_ascii=False))
+})().catch(error => { dump('TEST INSTALL ERROR: ' + error + '\\n'); })'''.replace('PATHS', json.dumps(paths)).replace('EXPECTEDDIR', json.dumps(str(root / '.test-profile' / 'data')))
+print(json.dumps(request(console, 'evaluateJSAsync', text=script), ensure_ascii=False))
 report = root / '.test-profile' / 'result.json'
 for attempt in range(450):
     if report.exists():
-        print(report.read_text(encoding='utf-8'))
+        result = json.loads(report.read_text(encoding='utf-8'))
+        print(json.dumps(result, ensure_ascii=False))
+        if not result.get('ok'):
+            raise RuntimeError('Zotero runtime checks failed')
         break
     time.sleep(0.1)
 else:

@@ -76,7 +76,7 @@ async function openDialog(window, selected) {
     total: ids.length,
     eligibleCount: eligible.length,
     initialField: remembered || "extra",
-    preview(field, text, separator) {
+    preview(field, text, separator, position) {
       const item = eligible.find(item => core.resolveField(Zotero, item, field));
       if (!item) return null;
       const actual = core.resolveField(Zotero, item, field);
@@ -84,15 +84,15 @@ async function openDialog(window, selected) {
       return {
         title: item.getField("title") || "无标题",
         oldValue,
-        newValue: core.append(oldValue, text, separator, Zotero.ItemFields.isMultiline(actual))
+        newValue: core.append(oldValue, text, separator, Zotero.ItemFields.isMultiline(actual), position)
       };
     },
-    async apply(field, text, separator) {
+    async apply(field, text, separator, position) {
       if (!active) throw new Error("插件已停用，请重新启用后操作。");
       if (saving) throw new Error("另一批文献正在保存，请稍后再试。");
       saving = true;
       try {
-        const result = await core.apply(Zotero, ids, field, text, separator);
+        const result = await core.apply(Zotero, ids, field, text, separator, position);
         try { Zotero.Prefs.set("extensions.batch-add-info.lastField", field, true); }
         catch (error) { Zotero.logError(error); }
         return result;

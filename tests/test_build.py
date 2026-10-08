@@ -52,13 +52,16 @@ class BuildTests(unittest.TestCase):
         original = self.build_package().read_bytes()
         path = self.root / "manifest.json"
         manifest = json.loads(path.read_text(encoding="utf-8"))
-        manifest["version"] = "1.0.3"
+        version_parts = manifest["version"].split(".")
+        version_parts[-1] = str(int(version_parts[-1]) + 1)
+        next_version = ".".join(version_parts)
+        manifest["version"] = next_version
         path.write_text(json.dumps(manifest), encoding="utf-8")
         package = self.build_package()
         feed = json.loads((self.root / "dist" / "updates.json").read_text(encoding="utf-8"))
         update, = feed["addons"][manifest["applications"]["zotero"]["id"]]["updates"]
-        self.assertEqual(update["version"], "1.0.3")
-        self.assertTrue(update["update_link"].endswith("/v1.0.3/zotero-batch-add-info-1.0.3.xpi"))
+        self.assertEqual(update["version"], next_version)
+        self.assertTrue(update["update_link"].endswith(f"/v{next_version}/zotero-batch-add-info-{next_version}.xpi"))
         self.assertNotEqual(package.read_bytes(), original)
         self.assertEqual(update["update_hash"], "sha256:" + hashlib.sha256(package.read_bytes()).hexdigest())
 
