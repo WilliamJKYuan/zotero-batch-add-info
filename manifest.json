@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "批量添加信息",
+  "version": "1.0.1",
+  "description": "通过文献右键菜单，向批量选中的文献字段追加内容，保留原信息。",
+  "author": "William Yuan",
+  "applications": {
+    "zotero": {
+      "id": "batch-add-info@yuan.local",
+      "strict_min_version": "10.0",
+      "strict_max_version": "10.0.*",
+      "update_url": "https://example.invalid/zotero-batch-add-info/updates.json"
+    }
+  }
+}

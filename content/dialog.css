@@ -1,0 +1,25 @@
+:root { color-scheme: light dark; font: 14px system-ui, sans-serif; }
+html, window { background: Canvas; color: CanvasText; }
+main { padding: 22px 26px; box-sizing: border-box; height: 100%; overflow: auto; }
+h1 { font-size: 21px; margin: 0 0 8px; }
+p { margin: 8px 0 14px; line-height: 1.55; }
+.muted, .hint { color: GrayText; }
+.hint { font-size: 12px; }
+label { display: block; margin: 0 0 7px; font-weight: 600; }
+select, textarea, button { font: inherit; color: CanvasText; background: Field; border: 1px solid GrayText; border-radius: 5px; }
+select, textarea { width: 100%; padding: 9px 10px; box-sizing: border-box; }
+textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+select:focus, textarea:focus, button:focus-visible { outline: 2px solid Highlight; outline-offset: 2px; }
+.separator-row { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+.separator-row label { margin: 0; white-space: nowrap; font-weight: 400; }
+.separator-row select { width: auto; flex: 1; }
+summary { cursor: pointer; font-weight: 600; }
+.preview-label { font-size: 12px; color: GrayText; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 130px; overflow: auto; background: Field; border: 1px solid ButtonBorder; border-radius: 5px; padding: 10px; margin-top: 6px; font: inherit; line-height: 1.5; }
+footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+button { padding: 9px 16px; cursor: pointer; }
+button.primary { color: HighlightText; background: Highlight; border-color: Highlight; }
+button:disabled { opacity: .55; cursor: default; }
+#status { min-height: 22px; font-size: 13px; }
+.success { color: light-dark(#23753a, #8bdda0); }
+.error { color: light-dark(#b42318, #ffaaa2); }

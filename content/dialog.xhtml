@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        title="添加信息" windowtype="batch-add-info:dialog"
+        width="620" height="650" style="min-width: 480px; min-height: 500px;">
+  <html:link rel="stylesheet" href="dialog.css"/>
+  <script src="dialog.js"/>
+  <html:main>
+    <html:h1>添加信息</html:h1>
+    <html:p id="selection-summary" class="muted"/>
+    <html:label for="field">要添加信息的字段</html:label>
+    <html:select id="field" aria-describedby="field-hint"/>
+    <html:p id="field-hint" class="hint"/>
+    <html:label for="content">要添加的内容</html:label>
+    <html:textarea id="content" rows="5" placeholder="输入要追加到所选文献字段末尾的内容…"/>
+    <html:div class="separator-row">
+      <html:label for="separator">与原内容之间</html:label>
+      <html:select id="separator">
+        <html:option value="auto">自动分隔</html:option>
+        <html:option value="space">添加空格</html:option>
+        <html:option value="newline">添加换行</html:option>
+        <html:option value="none">直接连接</html:option>
+      </html:select>
+    </html:div>
+    <html:p class="hint">保留原内容。自动分隔：摘要、其他等多行字段使用换行，其余字段使用空格。单行字段会将换行转换为空格。</html:p>
+    <html:details open="open">
+      <html:summary>追加预览（第一条适用文献）</html:summary>
+      <html:p id="preview-title" class="hint"/>
+      <html:div class="preview-label">追加后</html:div>
+      <html:pre id="preview"/>
+    </html:details>
+    <html:p id="status" role="status" aria-live="polite"/>
+    <html:footer>
+      <html:button id="cancel" type="button">取消</html:button>
+      <html:button id="apply" class="primary" type="button" disabled="disabled">添加到所选文献</html:button>
+    </html:footer>
+  </html:main>
+</window>
