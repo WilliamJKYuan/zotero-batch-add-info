@@ -4,9 +4,16 @@
 
 ## 安装
 
-1. 打开 Zotero，进入“工具 → 插件”。
-2. 点击插件管理窗口右上方齿轮，选择“Install Plugin From File…”（从文件安装插件）。
-3. 选择 `dist/zotero-batch-add-info-1.0.1.xpi`。
+1. 从 [最新 Release](https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/latest) 下载 XPI 安装包。开发时也可使用本地 `dist/zotero-batch-add-info-1.0.2.xpi`。
+2. 打开 Zotero，进入“工具 → 插件”。
+3. 点击插件管理窗口右上方齿轮，选择“Install Plugin From File…”（从文件安装插件）。
+4. 选择下载的 XPI。
+
+## 自动更新
+
+从 1.0.2 开始，插件通过最新 Release 的 [updates.json](https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/latest/download/updates.json) 检查更新。清单提供版本号、对应 XPI 下载地址、SHA-256 校验值和 Zotero 兼容范围。请在 Zotero 插件管理器中启用插件自动更新。
+
+1.0.1 及更早版本使用占位更新地址，需要手动安装一次 1.0.2 或更高版本；之后可自动更新。
 
 ## 使用
 
@@ -39,6 +46,7 @@ node --test tests/core.test.cjs
 node --check bootstrap.js
 node --check content/dialog.js
 python build.py
+python -m unittest discover -s tests -p test_build.py
 ```
 
 目标版本：Zotero 10.0.x。实现对照本机 Zotero 10.0.5 内置 API，以及官方 [Zotero 10 开发文档](https://www.zotero.org/support/dev/zotero_10_for_developers) 和 [菜单 API 文档](https://www.zotero.org/support/dev/zotero_8_for_developers#custom_menu_items)。
@@ -46,4 +54,12 @@ python build.py
 
 现有检查包括 6 项核心逻辑测试、JavaScript 语法检查和 XPI 打包。Zotero 运行时测试需要独立的测试配置目录。
 
-1.0.1 补齐了 Zotero 10 要求的 `update_url`。当前地址是 HTTPS 占位地址（`.invalid`），尚未提供自动更新服务；升级时请手动安装新版 XPI。
+## 发布新版
+
+1. 修改 `manifest.json` 的 `version`；根据已验证的 Zotero 版本调整兼容范围。
+2. 运行 `python build.py`，生成版本对应的 XPI 和 `dist/updates.json`，并运行上述检查。
+3. 提交源码，在 GitHub 创建 `v<版本号>` 的正式 Release，上传这次生成的 **XPI 和 updates.json 两个附件**，并将其设为最新版本（Latest）。
+
+每次打包会自动同步更新清单中的版本、下载地址、兼容范围和 XPI 校验值。只有安装包完成后才生成校验值；上传后不要再修改 XPI，若重新打包，应将两个附件一起更新。`updates.json` 是 Release 附件，无需发布 GitHub Pages。
+
+预发布版本不设为 Latest，也不用于正式版插件的自动更新。发布新版后，可在 Zotero 插件管理器中手动“检查更新”验证，后续由 Zotero 定期检查。

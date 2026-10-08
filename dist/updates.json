@@ -1,0 +1,20 @@
+{
+  "addons": {
+    "batch-add-info@yuan.local": {
+      "updates": [
+        {
+          "version": "1.0.2",
+          "update_link": "https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/download/v1.0.2/zotero-batch-add-info-1.0.2.xpi",
+          "update_hash": "sha256:548e719993a361db77ede9beb3edb9da435155ba624b13057cc0bbc4b3fa59a1",
+          "update_info_url": "https://github.com/WilliamJKYuan/zotero-batch-add-info/releases/tag/v1.0.2",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "10.0",
+              "strict_max_version": "10.0.*"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
